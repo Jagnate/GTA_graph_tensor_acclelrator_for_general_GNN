@@ -191,4 +191,4 @@ node_num = 3327
 edge_num = 9228
 size_per_feature = 3703
 num_of_classes = 7
-modify_yaml("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT_Cora.yaml",node_num,edge_num,size_per_feature,num_of_classes)
+modify_yaml("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT.yaml",node_num,edge_num,size_per_feature,num_of_classes)
