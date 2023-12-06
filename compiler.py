@@ -223,7 +223,7 @@ def create_optree(path,size):
 #[融合方式，融合块所占空间,融合块大小,分块数量,访存量]
 if __name__ == '__main__':
     size = 2*1024*1024
-    create_optree("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT_Cora.yaml",size)
+    create_optree("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT.yaml",size)
 
 
 #官方GCN GAT Cora Pubmed（reddit）2x2四个实验
