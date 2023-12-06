@@ -1,6 +1,5 @@
 import yaml
 
-
 def read(path):
     with open(path, 'r') as file:
         data = file.read()
@@ -83,21 +82,6 @@ def cal_perform(op_list,tile_size,tile_num,bandwidth,parallesim,path):
                 for j in range(0,data[op_list[i][0]]["INPUT"]["input_g_num"]):
                     compute += data[op_list[i][0]]["INPUT"]["input_size"][j]*data[op_list[i][0]]["INPUT"]["feature_number"][j]
             output = data[op_list[i][0]]["OUTPUT"]["output_number"]*data[op_list[i][0]]["OUTPUT"]["size_per_feature"]
-                #     print(data[op_list[i][0]]["INPUT"]["input_size"][j])
-                #     print(data[op_list[i][0]]["INPUT"]["feature_number"][j])
-                # print(compute)
-            # for j in range(0,data[op_list[i][0]]["INPUT"]["input_nong_num"]):
-            #     weight += data[op_list[i][0]]["INPUT"]["input_size"][j]
-            # for j in range(0,data[op_list[i][0]]["INPUT"]["input_g_num"]):
-            #     if(weight==0):
-            #         input_g += data[op_list[i][0]]["INPUT"]["size_per_feature"][j]*data[op_list[i][0]]["INPUT"]["feature_number"][j]
-            #     else:
-            #         input_g += data[op_list[i][0]]["INPUT"]["feature_number"][j]
-            # output = data[op_list[i][0]]["OUTPUT"]["output_number"]*data[op_list[i][0]]["OUTPUT"]["size_per_feature"]
-            # if(weight == 0 and data[op_list[i][0]]["TYPE"]!="scatter"):
-            #     compute = input_g/4
-            # else:
-            #     compute = weight*input_g/4
             temp_cycle = pipline(weight,input_g,output,tile_num[i],bandwidth,parallesim,compute)
             #record.append(temp_cycle)
             cycle += temp_cycle
@@ -177,27 +161,14 @@ if __name__ == '__main__':
 
 
 
-#[[[0], [1], [2], [3], [4], [5], [11], [6], [7], [8], [9], [10], [12], [13]], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],57527120]
+#[[[0], [1], [2], [3], [4], [5], [11], [6], [7], [8], [9], [10], [12], [13]], 
+#[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
+#[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#57527120]
     op_list = [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13]]
     tile_size = [1, 1, 1, 1, 1, 1, 1, 1,1,1,1,1,1,1]
     tile_num = [1, 1, 1, 1, 1, 1, 1, 1,1,1,1,1,1,1]
-    
     print("不融合不分块    Latency：",cal_perform(op_list,tile_size,tile_num,bandwidth,parallesim,path))
-
-# # [list([[0, 1, 2, 4, 6, 7, 8, 9, 10], [3, 11, 12, 13], [5]])
-# #  list([2083120, 2097024, 0]) list([376, 2032, 1]) list([29, 6, 1])
-# #  20841936]
-#     op_list_1 = [[0, 1, 2, 4, 6, 7, 8, 9, 10], [3, 11, 12, 13], [5]]
-#     tile_size_1 = [376, 2032, 1]
-#     tile_num_1 = [29, 6, 1]
-
-
-# # [list([[0, 1, 2], [3, 11, 12, 13], [4, 6, 7, 8, 9, 10], [5]])
-# #  list([2092640, 2097024, 2097152, 0]) list([1212, 2032, 32768, 1])
-# #  list([66, 39, 3, 1]) 74076080]
-#     op_list_1 = [[0, 1, 2], [3, 11, 12, 13], [4, 6, 7, 8, 9, 10], [5]]
-#     tile_size_1 = [1212, 2032, 32768, 1]
-#     tile_num_1 = [66, 39, 3, 1]
 
 # [list([[0, 1, 2], [3, 11, 12, 13], [4, 6, 7, 8, 9, 10], [5]])
 #  list([2090064, 2097024, 2097152, 0]) list([24, 2032, 32768, 1])
@@ -205,9 +176,8 @@ if __name__ == '__main__':
     op_list_1 = [[0, 1, 2], [3, 11, 12, 13], [4, 6, 7, 8, 9, 10], [5]]
     tile_size_1 = [24, 2032, 32768, 1]
     tile_num_1 = [555, 7, 1, 1]
-
-    
     print("融合分块最佳结果Latency：",cal_perform(op_list_1,tile_size_1,tile_num_1,bandwidth,parallesim,path))
+
     print("------------------------------------")
     print("不融合不分块   访存量：90722676")
     print("融合分块最佳结果访存量：56796004")
