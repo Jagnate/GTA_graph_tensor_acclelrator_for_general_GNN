@@ -104,11 +104,6 @@ def pipline(weight,input_g,output,tile_num,bandwidth,parallesim,compute):
 
     right_op_point = 0
 
-    # if(tile_num!=1):
-    #     compute = weight*tile_size/4
-    #     input_g = tile_size
-    #     output = tile_size
-
     for i in range(0,tile_num):
 
         left_load_point = right_load_point
@@ -150,16 +145,9 @@ def pipline(weight,input_g,output,tile_num,bandwidth,parallesim,compute):
         
 #op_list,tile_size,tile_num,bandwidth,parallesim,path
 if __name__ == '__main__':
-    path = "/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT_Cora.yaml"
+    path = "/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT.yaml"
     bandwidth = 128*1024*1024*1024
     parallesim = 256*4*(10**(9))
-    # op_list = [[0,1]]
-    # tile_size = [1]
-    # tile_num = [1]
-    
-    # print("不融合不分块    Latency：",cal_perform(op_list,tile_size,tile_num,bandwidth,parallesim,path))
-
-
 
 #[[[0], [1], [2], [3], [4], [5], [11], [6], [7], [8], [9], [10], [12], [13]], 
 #[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
