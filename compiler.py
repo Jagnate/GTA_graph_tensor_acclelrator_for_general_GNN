@@ -130,20 +130,29 @@ def fuse_pattern(data,src,dst, op_array, size, sg_list):
             for j in each_edge[i]:
                 for k in range(0,data[src[j]]["INPUT"]["input_g_num"]):
                     total += data[src[j]]["INPUT"]["size_per_feature"][k]
-                total += data[src[j]]["OUTPUT"]["size_per_feature"]
+                if(data[src[j]]["TYPE"]!="scatter"):
+                    total += data[src[j]]["OUTPUT"]["size_per_feature"]
                 total += data[dst[j]]["INPUT"]["size_per_feature"][int(data[dst[j]]["INPUT"]["input_g_list"].index(src[j]))]
-            for num in range(data[fuse_array[i][0]]["OUTPUT"]["output_number"],0,-1):
-                if(temp+num*total>size):
-                    continue
-                else:
-                    each_size[i] += num*(total)
-                    #多少个数/num个数一个块=多少个块
-                    tile_num[i] = math.ceil(data[src[j]]["OUTPUT"]["output_number"]/num)
-                    tile_size[i] = num*4
-                    flag = 1
-                    break
-            if(flag==0):
+            num = math.floor((size-temp)/total)
+            if(num<=0):
                 return False
+            else:
+                each_size[i] += num*(total)
+                #多少个数/num个数一个块=多少个块
+                tile_num[i] = math.ceil(data[src[j]]["OUTPUT"]["output_number"]/num)
+                tile_size[i] = num
+            # for num in range(data[fuse_array[i][0]]["OUTPUT"]["output_number"],0,-1):
+            #     if(temp+num*total>size):
+            #         continue
+            #     else:
+            #         each_size[i] += num*(total)
+            #         #多少个数/num个数一个块=多少个块
+            #         tile_num[i] = math.ceil(data[src[j]]["OUTPUT"]["output_number"]/num)
+            #         tile_size[i] = num*4
+            #         flag = 1
+            #         break
+            # if(flag==0):
+            #     return False
     #对剪开的边的输出op添加输入
     for j in record_0:
         if(j in sg_list):
@@ -152,6 +161,7 @@ def fuse_pattern(data,src,dst, op_array, size, sg_list):
             #print(dst[j],int(data[dst[j]]["INPUT"]["input_g_list"].index(src[j])))
             rw += data[dst[j]]["INPUT"]["feature_number"][int(data[dst[j]]["INPUT"]["input_g_list"].index(src[j]))]*data[dst[j]]["INPUT"]["size_per_feature"][int(data[dst[j]]["INPUT"]["input_g_list"].index(src[j]))]          
     #return [fuse_array,each_size,tile_size,tile_num,rw]
+            #[融合方式，融合块所占空间,融合块大小（多少个数不是byte）,分块数量,访存量]
     return [fuse_array,each_size,tile_size,tile_num,rw]
 
 
@@ -212,6 +222,7 @@ def create_optree(path,size):
     print(src)
     print(dst)
     print(edge)
+    print(sg_list)
     print("-----------------")
     res = generate_binary(data,edge,sg_list,src,dst,size)
     for i in range(0,10):
@@ -223,7 +234,7 @@ def create_optree(path,size):
 #[融合方式，融合块所占空间,融合块大小,分块数量,访存量]
 if __name__ == '__main__':
     size = 2*1024*1024
-    create_optree("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT.yaml",size)
+    create_optree("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT_Cora.yaml",size)
 
 
 #官方GCN GAT Cora Pubmed（reddit）2x2四个实验
