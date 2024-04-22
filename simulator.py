@@ -1,184 +1,185 @@
 import yaml
 
+#单位byte
+bw = 128*1024*1024*1024 #128GB/s
+pl = 256 #16*16 feature/s
+buffer_size = 2*1024*1024 #byte
+
+#结构
+compute_op     = ["mm","ele-wise"]
+compute_perfom = [pl,pl]
+
 def read(path):
     with open(path, 'r') as file:
         data = file.read()
         result = yaml.load(data,Loader=yaml.FullLoader)
         return result
 
-def cal_perform(op_list,tile_size,tile_num,bandwidth,parallesim,path):
-    data = read(path)
-    cycle = 0
-    #record = []
-    for i in range(0,len(op_list)):
-        if(len(op_list[i])>1):
-            weight = 0
-            input_g = 0
-            output = 0
-            compute = 0
-            for k in op_list[i]:
-                if(tile_size[i]==1):
-                    temp_input_g = 0
-                    temp_weight = 0
-                    for j in range(0,data[k]["INPUT"]["input_nong_num"]):
-                        weight += data[k]["INPUT"]["input_size"][j]
-                        temp_weight += data[k]["INPUT"]["input_size"][j]
-                    if(data[k]["INPUT"]["input_g_num"]==1 and len(data[k]["INPUT"]["input_list"])==0):
-                        input_g += data[k]["INPUT"]["size_per_feature"][0]*data[k]["INPUT"]["feature_number"][0]
-                        temp_input_g += data[k]["INPUT"]["feature_number"][0]
-                    else:
-                        for j in range(0,data[k]["INPUT"]["input_g_num"]):
-                            if(data[k]["INPUT"]["input_list"][j] not in op_list[i]):
-                                input_g += data[k]["INPUT"]["size_per_feature"][j]*data[k]["INPUT"]["feature_number"][j]
-                            temp_input_g += data[k]["INPUT"]["feature_number"][j]
-                    if(len(data[k]["OUTPUT"]["output_list"])==0):
-                        output += data[k]["OUTPUT"]["output_number"]*data[k]["OUTPUT"]["size_per_feature"]
-                    else:
-                        for j in range(0,len(data[k]["OUTPUT"]["output_list"])):
-                            if(data[k]["OUTPUT"]["output_list"][j] not in op_list[i]):
-                                output += data[k]["OUTPUT"]["output_number"]*data[k]["OUTPUT"]["size_per_feature"]
-                    if(temp_weight == 0 and data[k]["TYPE"]!="scatter"):
-                        temp_weight = 1
-                    compute += temp_weight*temp_input_g
-                else:
-                    temp_input_g = 0
-                    temp_weight = 0
-                    for j in range(0,data[k]["INPUT"]["input_nong_num"]):
-                        weight += data[k]["INPUT"]["input_size"][j]
-                        temp_weight += data[k]["INPUT"]["input_size"][j]
-                    if(len(data[k]["INPUT"]["input_list"])==0):
-                        input_g += tile_size[i]
-                        temp_input_g += tile_size[i]
-                    else:
-                        for j in range(0,data[k]["INPUT"]["input_g_num"]):
-                            if(data[k]["INPUT"]["input_list"][j] not in op_list[i]):
-                                input_g += tile_size[i]
-                            else:
-                                temp_input_g += tile_size[i]
-                    if(len(data[k]["OUTPUT"]["output_list"])==0):
-                        output += data[k]["OUTPUT"]["output_number"]*data[k]["OUTPUT"]["size_per_feature"]
-                    else:
-                        for j in range(0,len(data[k]["OUTPUT"]["output_list"])):
-                            if(data[k]["OUTPUT"]["output_list"][j] not in op_list[i]):
-                                output += data[k]["OUTPUT"]["output_number"]*data[k]["OUTPUT"]["size_per_feature"]
-                    if(temp_weight == 0 and data[k]["TYPE"]!="scatter"):
-                        temp_weight = 4
-                    compute += temp_weight*temp_input_g/4
-            temp_cycle = pipline(weight,input_g,output,tile_num[i],bandwidth,parallesim,compute)
-            # record.append(temp_cycle)
-            cycle += temp_cycle
-        else:
-            weight = 0
-            input_g = 0
-            output = 0
-            compute = 0
-            if(data[op_list[i][0]]["INPUT"]["input_nong_num"]==0):
-                for j in range(0,data[op_list[i][0]]["INPUT"]["input_g_num"]):
-                    input_g += data[op_list[i][0]]["INPUT"]["size_per_feature"][j]*data[op_list[i][0]]["INPUT"]["feature_number"][j]
-                compute = input_g
+def pipeline(data):
+    load_p = 0
+    save_p = 0
+    compute_p = [0,0] #mm, ele-wise
+    c_p = 0
+    total_p = 0
+    for i in range(0,len(data)): #遍历大块
+        for j in range(0,len(data[i]["load_list"])): #大块里有几个op
+            #先读weight
+            load = data[i]["w_list"][j]/bw
+            if(load_p + load > c_p):
+                load_p = save_p + load
+                total_p += load/bw
             else:
-                for j in range(0,data[op_list[i][0]]["INPUT"]["input_nong_num"]):
-                    weight += data[op_list[i][0]]["INPUT"]["input_size"][j]
-                for j in range(0,data[op_list[i][0]]["INPUT"]["input_g_num"]):
-                    compute += data[op_list[i][0]]["INPUT"]["input_size"][j]*data[op_list[i][0]]["INPUT"]["feature_number"][j]
-            output = data[op_list[i][0]]["OUTPUT"]["output_number"]*data[op_list[i][0]]["OUTPUT"]["size_per_feature"]
-            temp_cycle = pipline(weight,input_g,output,tile_num[i],bandwidth,parallesim,compute)
-            #record.append(temp_cycle)
-            cycle += temp_cycle
-    return cycle*(10**3)
+                load_p += load
+            #读feature
+            print(data[i]["load_num"][j])
+            for num in range(0,data[i]["load_num"][j]): #第j个op需要读几次
+                load = data[i]["load_list"][j]/bw
+                if(load_p + load > c_p):
+                    load_p = save_p + load
+                    total_p += load
+                else:
+                    load_p += load
+            for num in range(0,int(data[i]["compute_num"][j])): #第j个op需要读几次
+                compute = data[i]["compute_list"][j]/pl
+                if(data[i]["compute_type"][j] == 0):
+                    if(load_p < compute_p[0]):
+                        compute_p[0] += + compute
+                    else:
+                        compute_p[0] += load_p + compute
+                elif(data[i]["compute_type"][j] == 1):
+                    if(load_p < compute_p[1]):
+                        compute_p[1] += + compute
+                    else:
+                        compute_p[1] += load_p + compute
+                if(compute_p[0] > compute_p[1]):
+                    c_p = compute_p[0]
+                else:
+                    c_p = compute_p[1]
+            for num in range(0,int(data[i]["save_num"][j])):
+                save = data[i]["save_list"][j]/bw
+                if(c_p < save_p):
+                    save_p += save
+                else:
+                    save_p += c_p + save
+                total_p = save_p    
+    return total_p
+         
 
-
-def pipline(weight,input_g,output,tile_num,bandwidth,parallesim,compute):
-    load_w_duration = weight/bandwidth
-    load_g_duration = 0
-    compute_duration = 0
-    save_duration = 0
-
-    left_load_point = 0
-    right_load_point = 0
-
-    left_compute_point = 0
-    right_compute_point = 0
-
-    right_save_point = 0
-
-    right_op_point = 0
-
-    for i in range(0,tile_num):
-
-        left_load_point = right_load_point
-        load_g_duration = input_g/bandwidth
-        if(i==0):
-            right_load_point = left_load_point + load_w_duration + load_g_duration
-        else:
-            right_load_point = left_load_point + load_g_duration
-        
-        if(right_load_point > right_op_point):
-            right_op_point = right_load_point
-
-        #print("Load: time:",i,"Latency:",right_op_point)
-        
-        if(right_compute_point < right_load_point):
-            left_compute_point = right_load_point
-        else:
-            left_compute_point = right_compute_point
-        compute_duration = compute/parallesim
-        right_compute_point = left_compute_point + compute_duration
-        if(right_compute_point > right_op_point):
-            right_op_point = right_compute_point
-
-        #print("Compute:",right_op_point)
-
-        if(right_save_point < right_compute_point):
-            left_save_point = right_compute_point
-        else:
-            left_save_point = right_save_point
-
-        save_duration = output/bandwidth
-        right_save_point = left_save_point + save_duration
-        if(right_save_point > right_op_point):
-            right_op_point = right_save_point
-
-        #print("Save:",right_op_point)
-
-    return right_op_point
-        
-#op_list,tile_size,tile_num,bandwidth,parallesim,path
 if __name__ == '__main__':
-    path = "/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT.yaml"
-    bandwidth = 128*1024*1024*1024
-    parallesim = 256*4*(10**(9))
 
-#[[[0], [1], [2], [3], [4], [5], [11], [6], [7], [8], [9], [10], [12], [13]], 
-#[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 
-#[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#57527120]
-    op_list = [[0],[1],[2],[3],[4],[5],[6],[7],[8],[9],[10],[11],[12],[13]]
-    tile_size = [1, 1, 1, 1, 1, 1, 1, 1,1,1,1,1,1,1]
-    tile_num = [1, 1, 1, 1, 1, 1, 1, 1,1,1,1,1,1,1]
-    print("不融合不分块    Latency：",cal_perform(op_list,tile_size,tile_num,bandwidth,parallesim,path))
+    data = read("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/fused.yaml")
 
-# [list([[0, 1, 2], [3, 11, 12, 13], [4, 6, 7, 8, 9, 10], [5]])
-#  list([2090064, 2097024, 2097152, 0]) list([24, 2032, 32768, 1])
-#  list([555, 7, 1, 1]) 56796004]
-    op_list_1 = [[0, 1, 2], [3, 11, 12, 13], [4, 6, 7, 8, 9, 10], [5]]
-    tile_size_1 = [24, 2032, 32768, 1]
-    tile_num_1 = [555, 7, 1, 1]
-    print("融合分块最佳结果Latency：",cal_perform(op_list_1,tile_size_1,tile_num_1,bandwidth,parallesim,path))
-
-    print("------------------------------------")
-    print("不融合不分块   访存量：90722676")
-    print("融合分块最佳结果访存量：56796004")
+    print(pipeline(data))
 
 
+#实际存储大小为tile_size*size_per_feature(size_per_feature*4)
+#tile_size为多少个数，多少个结点/边
+# def create_list(data, op_list, tile_size):
+#     load_list = [] #s
+#     compute_list = [] #s
+#     compute_type = [] #[0,1] 0:mm; 1:ele-wise
+#     save_list = [] #s
+#     load_num_list = [] #需要load多少次才能compute or save,一个下标代表一个大块
+#     #comp_num_list = [] #需要compute多少次才能save 
+#     for i in range(0,len(op_list)): #遍历大块
+#         #load_num_list.append(0)
+#         load_list.append([])
+#         compute_list.append([])
+#         compute_type.append([])
+#         save_list.append([])
+#         #comp_num_list.append(0)
+#         for j in range(0,len(op_list[i])): #遍历大块里的op
+#             #SCATTER
+#             if data[op_list[i][j]]["TYPE"] == "scatter":
+#                 #load
+#                 if data[op_list[i][j]]["ORDER"] == "R":
+#                     for k in data[op_list[i][j]]["INPUT"]["size_per_feature"]:
+#                         load_list[len(load_list)-1].append(tile_size[i]*k/bw)
+#                         load_num_list[len(load_num_list)-1] += 1
+#                 else: #顺序不一致的时候，一个一个scatter
+#                     for k in data[op_list[i][j]]["INPUT"]["size_per_feature"]:
+#                         load_list[len(load_list)-1].append(1*k/bw)
+#                         load_num_list[len(load_num_list)-1] += 1
+#                 compute_type[len(compute_type)-1].append(-1)
+#                 compute_list[len(compute_list)-1].append(0)
+#                 #save
+#                 save_list[len(save_list)-1].append(data[op_list[i][j]]["OUTPUT"]["size_per_feature"]*tile_size[i]/bw)
+#             #GATHER
+#             elif data[op_list[i][j]]["TYPE"] == "gather":
+#                 #load
+#                 if data[op_list[i][j]]["ORDER"] == "R":
+#                     for k in data[op_list[i][j]]["INPUT"]["size_per_feature"]:
+#                             load_list[len(load_list)-1].append(tile_size[i]*k/bw)
+#                             #load_num_list[len(load_num_list)-1] += 1
+#                 else: #顺序不一致的时候，一个一个gather
+#                     for k in data[op_list[i][j]]["INPUT"]["size_per_feature"]:
+#                             load_list[len(load_list)-1].append(1*k/bw)
+#                             #load_num_list[len(load_num_list)-1] += 1
+#                 #compute - plus(ele-wise)
+#                 compute_type[len(compute_type)-1].append(1)
+#                 compute_list[len(compute_list)-1].append(tile_size[i]/pl)
+#                 #save
+#                 save_list[len(save_list)-1].append(data[op_list[i][j]]["OUTPUT"]["size_per_feature"]*tile_size[i]/bw)
+#             #APPLY
+#             else:
+#                 #权重读取
+#                 if data[op_list[i][j]]["INPUT"]["input_nong_num"] != 0:
+#                     compute_type[len(compute_type)-1].append(0)
+#                     for k in data[op_list[i][j]]["INPUT"]["input_size"]:
+#                         load_list[len(load_list)-1].append(k/bw)
+#                         #load_num_list[len(load_num_list)-1] += 1
+#                 else:
+#                     compute_type[len(compute_type)-1].append(1)
+#                 #特征读取
+#                 for k in data[op_list[i][j]]["INPUT"]["size_per_feature"]:
+#                     load_list[len(load_list)-1].append(tile_size[i]*k/bw)
+#                     #load_num_list[len(load_num_list)-1] += 1
+#                 #计算
+#                 if compute_type[len(compute_type)-1][len(compute_type[len(compute_type)-1])-1] == 0: #mm
+#                     #mm不确定怎么算的？
+#                     compute_list[len(compute_list)-1].append(data[op_list[i][j]]["INPUT"]["input_size"][0]*tile_size[i]/(pl*data[op_list[i][j]]["OUTPUT"]["size_per_feature"]))
+#                 else: #element-wise
+#                     for k in range(0,data[op_list[i][j]]["INPUT"]["input_g_num"]):
+#                         compute_list[len(compute_list)-1].append(tile_size[i]/pl)
+#                 #save
+#                 save_list[len(save_list)-1].append(data[op_list[i][j]]["OUTPUT"]["size_per_feature"]*tile_size[i]/bw)
 
-#BW = 128GB/s
-#1ns 一个 cycle 1个cycle128byte
-#FP32 4 byte x size_per_Feature x feature_number
-#latency x30 每个读写都有30ns
+#     return load_list, load_num_list, compute_list, compute_type, save_list
+            
 
-#缓存大小 = 2MB = 2 x 1024 x 1024 byte
-#权重的数量 4byte
-
-#并行层：256=16x16
-#2层
+# def pipeline(load_list, load_num_list, compute_list, compute_type, save_list, tile_num):
+#     load_p = 0
+#     save_p = 0
+#     compute_p = [0,0] #mm, ele-wise
+#     c_p = 0
+#     total_p = 0
+#     for i in range(0,len(tile_num)): #第i个大块
+#         for j in range(0,tile_num[i]): #第i个块的分块数量
+#             for load in load_list[i]:
+#                 for each_load in load:
+#                     if(load_p + load > c_p):
+#                         load_p = save_p + load
+#                         total_p += load
+#                     else:
+#                         load_p += load
+#                 for k in range(0,compute_list[i]):
+#                     if(compute_type[i][k] == 0):
+#                         if(load_p < compute_p[0]):
+#                             compute_p[0] += + compute_list[i][k]
+#                         else:
+#                             compute_p[0] += load_p + compute_list[i][k]
+#                     elif(compute_type[i][k] == 1):
+#                         if(load_p < compute_p[1]):
+#                             compute_p[1] += + compute_list[i][k]
+#                         else:
+#                             compute_p[1] += load_p + compute_list[i][k]
+#                     if(compute_p[0] > compute_p[1]):
+#                         c_p = compute_p[0]
+#                     else:
+#                         c_p = compute_p[1]
+#                     for save in save_list[i]:
+#                         if(c_p < save_p):
+#                             save_p += save
+#                         else:
+#                             save_p += c_p + save
+#                         total_p = save_p    

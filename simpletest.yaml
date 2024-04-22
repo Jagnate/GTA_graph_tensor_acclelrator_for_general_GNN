@@ -1,16 +1,16 @@
 - INPUT:
     feature_number:
-    - 3327
+    - 2708
     input_g_list: []
     input_g_num: 1
     input_list: []
     input_nong_list: []
     input_nong_num: 1
     input_size:
-    - 1895936
+    - 733696
     node_id: filename.coo
     size_per_feature:
-    - 14812
+    - 5732
   OP_NO: 0
   ORDER: R
   OUTPUT:
@@ -18,13 +18,12 @@
     output_list:
     - 1
     - 2
-    - 3
-    output_number: 3327
+    output_number: 2708
     size_per_feature: 512
   TYPE: applynode
 - INPUT:
     feature_number:
-    - 3327
+    - 2708
     input_g_list:
     - 0
     input_g_num: 1
@@ -41,14 +40,13 @@
   ORDER: R
   OUTPUT:
     output_id: filename.coo
-    output_list:
-    - 4
-    output_number: 3327
+    output_list: [3]
+    output_number: 2708
     size_per_feature: 16
   TYPE: applynode
 - INPUT:
     feature_number:
-    - 3327
+    - 2708
     input_g_list:
     - 0
     input_g_num: 1
@@ -66,43 +64,43 @@
   OUTPUT:
     output_id: filename.coo
     output_list:
-    - 5
-    output_number: 3327
+    - 4
+    output_number: 2708
     size_per_feature: 16
   TYPE: applynode
 - INPUT:
     edge_id: filename.coo
     feature_number:
-    - 3327
+    - 2708
     input_g_list:
-    - 0
+    - 1
     input_g_num: 1
     input_list:
-    - 0
+    - 1
     input_nong_list: []
     input_nong_num: 0
     input_size: []
-    node_id: []
+    node_id: filename.coo
     size_per_feature:
-    - 512
+    - 16
   OP_NO: 3
-  ORDER: C
+  ORDER: R
   OUTPUT:
     output_id: filename.coo
     output_list:
-    - 11
-    output_number: 9228
-    size_per_feature: 512
+    - 5
+    output_number: 10556
+    size_per_feature: 16
   TYPE: scatter
 - INPUT:
     edge_id: filename.coo
     feature_number:
-    - 3327
+    - 2708
     input_g_list:
-    - 1
+    - 2
     input_g_num: 1
     input_list:
-    - 1
+    - 2
     input_nong_list: []
     input_nong_num: 0
     input_size: []
@@ -110,68 +108,64 @@
     size_per_feature:
     - 16
   OP_NO: 4
-  ORDER: R
-  OUTPUT:
-    output_id: filename.coo
-    output_list:
-    - 6
-    output_number: 9228
-    size_per_feature: 16
-  TYPE: scatter
-- INPUT:
-    edge_id: filename.coo
-    feature_number:
-    - 3327
-    input_g_list:
-    - 2
-    input_g_num: 1
-    input_list:
-    - 2
-    input_nong_list: []
-    input_nong_num: 0
-    input_size: []
-    node_id: filename.coo
-    size_per_feature:
-    - 16
-  OP_NO: 5
   ORDER: C
   OUTPUT:
     output_id: filename.coo
-    output_list:
-    - 6
-    output_number: 9228
+    output_list: [5]
+    output_number: 10556
     size_per_feature: 16
   TYPE: scatter
 - INPUT:
     feature_number:
-    - 9228
-    - 9228
+    - 10556
+    - 10556
     input_g_list:
+    - 3
     - 4
-    - 5
     input_g_num: 2
     input_list:
+    - 3
     - 4
-    - 5
     input_nong_list: []
     input_nong_num: 0
     input_size: []
     node_id: filename.coo
     size_per_feature:
     - 16
+    - 16
+  OP_NO: 5
+  ORDER: R
+  OUTPUT:
+    output_id: filename.coo
+    output_list: [6]
+    output_number: 10556
+    size_per_feature: 16
+  TYPE: applyedge
+- INPUT:
+    feature_number:
+    - 10556
+    input_g_list:
+    - 5
+    input_g_num: 1
+    input_list:
+    - 5
+    input_nong_list: []
+    input_nong_num: 0
+    input_size: []
+    node_id: filename.coo
+    size_per_feature:
     - 16
   OP_NO: 6
   ORDER: R
   OUTPUT:
     output_id: filename.coo
-    output_list:
-    - 7
-    output_number: 9228
+    output_list: [7]
+    output_number: 10556
     size_per_feature: 16
   TYPE: applyedge
 - INPUT:
     feature_number:
-    - 9228
+    - 10556
     input_g_list:
     - 6
     input_g_num: 1
@@ -187,16 +181,13 @@
   ORDER: R
   OUTPUT:
     output_id: filename.coo
-    output_list:
-    - 8
-    - 9
-    output_number: 9228
+    output_list: [8]
+    output_number: 2708
     size_per_feature: 16
-  TYPE: applyedge
+  TYPE: gather
 - INPUT:
-    edge_id: filename.coo
     feature_number:
-    - 9228
+    - 2708
     input_g_list:
     - 7
     input_g_num: 1
@@ -212,132 +203,7 @@
   ORDER: R
   OUTPUT:
     output_id: filename.coo
-    output_list:
-    - 10
-    output_number: 3327
-    size_per_feature: 16
-  TYPE: gather
-- INPUT:
-    feature_number:
-    - 9228
-    - 9228
-    input_g_list:
-    - 7
-    - 10
-    input_g_num: 2
-    input_list:
-    - 7
-    - 10
-    input_nong_list: []
-    input_nong_num: 0
-    input_size: []
-    node_id: filename.coo
-    size_per_feature:
-    - 16
-    - 16
-  OP_NO: 9
-  ORDER: R
-  OUTPUT:
-    output_id: filename.coo
-    output_list:
-    - 11
-    output_number: 3327
-    size_per_feature: 16
-  TYPE: applyedge
-- INPUT:
-    edge_id: filename.coo
-    feature_number:
-    - 3327
-    input_g_list:
-    - 8
-    input_g_num: 1
-    input_list:
-    - 8
-    input_nong_list: []
-    input_nong_num: 0
-    input_size: []
-    node_id: filename.coo
-    size_per_feature:
-    - 16
-  OP_NO: 10
-  ORDER: R
-  OUTPUT:
-    output_id: filename.coo
-    output_list:
-    - 9
-    output_number: 9228
-    size_per_feature: 16
-  TYPE: scatter
-- INPUT:
-    feature_number:
-    - 9228
-    - 9228
-    input_g_list:
-    - 3
-    - 9
-    input_g_num: 2
-    input_list:
-    - 3
-    - 9
-    input_nong_list: []
-    input_nong_num: 0
-    input_size: []
-    node_id: filename.coo
-    size_per_feature:
-    - 16
-    - 512
-  OP_NO: 11
-  ORDER: R
-  OUTPUT:
-    output_id: filename.coo
-    output_list:
-    - 12
-    output_number: 9228
-    size_per_feature: 512
-  TYPE: applyedge
-- INPUT:
-    edge_id: filename.coo
-    feature_number:
-    - 9228
-    input_g_list:
-    - 11
-    input_g_num: 1
-    input_list:
-    - 11
-    input_nong_list: []
-    input_nong_num: 0
-    input_size: []
-    node_id: filename.coo
-    size_per_feature:
-    - 512
-  OP_NO: 12
-  ORDER: R
-  OUTPUT:
-    output_id: filename.coo
-    output_list:
-    - 13
-    output_number: 3327
-    size_per_feature: 512
-  TYPE: gather
-- INPUT:
-    feature_number:
-    - 9228
-    input_g_list:
-    - 12
-    input_g_num: 1
-    input_list:
-    - 12
-    input_nong_list: []
-    input_nong_num: 0
-    input_size: []
-    node_id: filename.coo
-    size_per_feature:
-    - 512
-  OP_NO: 13
-  ORDER: R
-  OUTPUT:
-    output_id: filename.coo
     output_list: []
-    output_number: 3327
-    size_per_feature: 512
+    output_number: 2708
+    size_per_feature: 16
   TYPE: applynode

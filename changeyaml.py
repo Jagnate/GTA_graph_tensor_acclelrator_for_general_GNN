@@ -94,7 +94,7 @@ def modify_yaml(path,node_num,edge_num,size_per_feature,num_of_classes):
 
     # data[14]["INPUT"]["size_per_feature"]    = [size_per_feature*4]
     # data[14]["INPUT"]["feature_number"]      = [node_num]
-    # data[14]["INPUT"]["input_size"]          = [num_of_classes*edge_num*4]
+    # data[14]["INPUT"]["input_size"]          = [num_of_classes*size_per_feature*4]
     # data[14]["OUTPUT"]["size_per_feature"]   = num_of_classes*4
     # data[14]["OUTPUT"]["output_number"]      = node_num
 
@@ -179,16 +179,23 @@ def modify_yaml(path,node_num,edge_num,size_per_feature,num_of_classes):
     with open(path, 'w') as file:
         yaml.safe_dump(data, file)
 
-# node_num = 2708
-# edge_num = 10556
-# size_per_feature = 1433
-# num_of_classes = 7
+node_num = 2708
+edge_num = 10556
+size_per_feature = 1433
+num_of_classes = 7
 # node_num = 19717
 # edge_num = 88651
 # size_per_feature = 500
 # num_of_classes = 7
-node_num = 3327
-edge_num = 9228
-size_per_feature = 3703
-num_of_classes = 7
-modify_yaml("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT.yaml",node_num,edge_num,size_per_feature,num_of_classes)
+        
+# node_num = 3327
+# edge_num = 9228
+# size_per_feature = 3703
+# num_of_classes = 7
+        
+# node_num = 232965
+# edge_num = 114615892
+# size_per_feature = 602
+# num_of_classes = 7
+modify_yaml("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT_Cora.yaml",node_num,edge_num,size_per_feature,num_of_classes)
+print("Successful")
