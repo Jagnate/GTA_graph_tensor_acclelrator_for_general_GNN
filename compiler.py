@@ -194,6 +194,9 @@ def generate_binary(data,edge,sg_list,src,dst,size):
                 continue
             else:
                 res.append(temp_res)
+                specific_binary = '0000011101101111'
+                if binary == specific_binary:
+                    print(f"temp_res for binary {specific_binary}: {temp_res}")
                 if(len(res)==1):
                     print(res[0])
                 # print(res[len(res)-1])
@@ -227,6 +230,8 @@ def create_optree(path,size):
     res = generate_binary(data,edge,sg_list,src,dst,size)
     for i in range(0,10):
         print(res[i])
+    for i in range(1,10):
+        print(res[len(res)-i])
     # for i in range(len(res)-1,len(res)-10,-1):
     #     print(res[i])
     #print(res[0])
@@ -234,7 +239,7 @@ def create_optree(path,size):
 #[融合方式，融合块所占空间,融合块大小,分块数量,访存量]
 if __name__ == '__main__':
     size = 2*1024*1024
-    create_optree("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT_Cora.yaml",size)
+    create_optree("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/v1/GAT_Cora.yaml",size)
 
 
 #官方GCN GAT Cora Pubmed（reddit）2x2四个实验
