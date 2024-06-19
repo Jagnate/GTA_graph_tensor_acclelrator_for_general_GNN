@@ -1,6 +1,6 @@
 import yaml
 
-def modify_yaml(path,node_num,edge_num,size_per_feature,num_of_classes):
+def modify_yaml(path,node_num,edge_num,size_per_feature,isByte):
     with open(path, 'r') as file:
         data = yaml.safe_load(file)
 
@@ -87,7 +87,7 @@ def modify_yaml(path,node_num,edge_num,size_per_feature,num_of_classes):
     data[12]["OUTPUT"]["output_number"]      = node_num
 
     data[13]["INPUT"]["size_per_feature"]    = [128*4]
-    data[13]["INPUT"]["feature_number"]      = [edge_num]
+    data[13]["INPUT"]["feature_number"]      = [node_num]
     data[13]["INPUT"]["input_size"]          = []
     data[13]["OUTPUT"]["size_per_feature"]   = 128*4
     data[13]["OUTPUT"]["output_number"]      = node_num
@@ -179,23 +179,30 @@ def modify_yaml(path,node_num,edge_num,size_per_feature,num_of_classes):
     with open(path, 'w') as file:
         yaml.safe_dump(data, file)
 
-node_num = 2708
-edge_num = 10556
-size_per_feature = 1433
-num_of_classes = 7
+#cora
+# node_num = 2708
+# edge_num = 10556
+# size_per_feature = 1433
+# num_of_classes = 7
+
+#Pubmed
 # node_num = 19717
 # edge_num = 88651
 # size_per_feature = 500
 # num_of_classes = 7
         
-# node_num = 3327
-# edge_num = 9228
-# size_per_feature = 3703
-# num_of_classes = 7
-        
+#CiteSeer
+node_num = 3327
+edge_num = 9228
+size_per_feature = 3703
+num_of_classes = 7
+
+#Reddit        
 # node_num = 232965
 # edge_num = 114615892
 # size_per_feature = 602
 # num_of_classes = 7
-modify_yaml("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/GAT_Cora.yaml",node_num,edge_num,size_per_feature,num_of_classes)
+
+
+modify_yaml("/Users/sijin/Desktop/RA/MPAD/Eva/Compiler/v1/GAT_Cora.yaml",node_num,edge_num,size_per_feature,num_of_classes)
 print("Successful")
