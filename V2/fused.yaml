@@ -1,0 +1,412 @@
+0:
+  OP_NO: 0
+  compute_list:
+  - 473984.0
+  compute_shape:
+  - - 1
+    - 1
+  compute_type:
+  - 0
+  isR: 1
+  load_list:
+  - 14812
+  load_shape:
+  - - 1
+    - 1
+  save_list:
+  - 512
+  - 512
+  - 512
+  save_shape:
+  - - 1
+    - 1
+  - - 1
+    - 1
+  - - 1
+    - 1
+  sparse_path: ''
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applynode
+  w_list:
+  - - 128.0
+    - 14812
+1:
+  OP_NO: 1
+  compute_list:
+  - 512.0
+  compute_shape:
+  - - 1
+    - 1
+  compute_type:
+  - 0
+  isR: 1
+  load_list:
+  - 512
+  load_shape:
+  - - 1
+    - 1
+  save_list:
+  - 16
+  save_shape:
+  - - 1
+    - 1
+  sparse_path: ''
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applynode
+  w_list:
+  - - 4.0
+    - 512
+2:
+  OP_NO: 2
+  compute_list:
+  - 512.0
+  compute_shape:
+  - - 1
+    - 1
+  compute_type:
+  - 0
+  isR: 1
+  load_list:
+  - 512
+  load_shape:
+  - - 1
+    - 1
+  save_list:
+  - 16
+  save_shape:
+  - - 1
+    - 1
+  sparse_path: ''
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applynode
+  w_list:
+  - - 4.0
+    - 512
+3:
+  OP_NO: 4
+  compute_list:
+  - 0
+  compute_shape:
+  - 0
+  compute_type:
+  - -1
+  isR: 1
+  load_list:
+  - 16
+  load_shape:
+  - - 3327
+    - 1
+  save_list:
+  - 16
+  save_shape:
+  - - 2708
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: scatter
+  w_list:
+  - - 0
+    - 0
+4:
+  OP_NO: 5
+  compute_list:
+  - 0
+  compute_shape:
+  - 0
+  compute_type:
+  - -1
+  isR: 0
+  load_list:
+  - 16
+  load_shape:
+  - - 1
+    - 1
+  save_list:
+  - 16
+  save_shape:
+  - - 1
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: scatter
+  w_list:
+  - - 0
+    - 0
+5:
+  OP_NO: 6
+  compute_list:
+  - 16
+  compute_shape:
+  - - 2708
+    - 3327
+  compute_type:
+  - 1
+  isR: 1
+  load_list:
+  - 16
+  - 16
+  load_shape:
+  - - 2708
+    - 3327
+  - - 2708
+    - 3327
+  save_list:
+  - 16
+  save_shape:
+  - - 2708
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applyedge
+  w_list:
+  - - 0
+    - 0
+6:
+  OP_NO: 7
+  compute_list:
+  - 16
+  compute_shape:
+  - - 2708
+    - 3327
+  compute_type:
+  - 1
+  isR: 1
+  load_list:
+  - 16
+  load_shape:
+  - - 2708
+    - 3327
+  save_list:
+  - 16
+  - 16
+  save_shape:
+  - - 2708
+    - 3327
+  - - 2708
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applyedge
+  w_list:
+  - - 0
+    - 0
+7:
+  OP_NO: 8
+  compute_list:
+  - 16
+  compute_shape:
+  - - 2708
+    - 3327
+  compute_type:
+  - 1
+  isR: 1
+  load_list:
+  - 16
+  - 16
+  load_shape:
+  - - 3327
+    - 1
+  - - 2708
+    - 3327
+  save_list:
+  - 16
+  save_shape:
+  - - 1
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: gather
+  w_list:
+  - - 0
+    - 0
+8:
+  OP_NO: 9
+  compute_list:
+  - 16
+  compute_shape:
+  - - 2708
+    - 3327
+  compute_type:
+  - 1
+  isR: 1
+  load_list:
+  - 16
+  - 16
+  load_shape:
+  - - 2708
+    - 3327
+  - - 2708
+    - 3327
+  save_list:
+  - 16
+  save_shape:
+  - - 2708
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applyedge
+  w_list:
+  - - 0
+    - 0
+9:
+  OP_NO: 10
+  compute_list:
+  - 0
+  compute_shape:
+  - 0
+  compute_type:
+  - -1
+  isR: 1
+  load_list:
+  - 16
+  load_shape:
+  - - 3327
+    - 1
+  save_list:
+  - 16
+  save_shape:
+  - - 2708
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: scatter
+  w_list:
+  - - 0
+    - 0
+10:
+  OP_NO: 3
+  compute_list:
+  - 0
+  compute_shape:
+  - 0
+  compute_type:
+  - -1
+  isR: 0
+  load_list:
+  - 512
+  load_shape:
+  - - 1
+    - 1
+  save_list:
+  - 512
+  save_shape:
+  - - 1
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: scatter
+  w_list:
+  - - 0
+    - 0
+11:
+  OP_NO: 11
+  compute_list:
+  - 16
+  compute_shape:
+  - - 2708
+    - 3327
+  compute_type:
+  - 1
+  isR: 1
+  load_list:
+  - 16
+  - 512
+  load_shape:
+  - - 2708
+    - 3327
+  - - 2708
+    - 3327
+  save_list:
+  - 512
+  save_shape:
+  - - 2708
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applyedge
+  w_list:
+  - - 0
+    - 0
+12:
+  OP_NO: 12
+  compute_list:
+  - 512
+  compute_shape:
+  - - 2708
+    - 3327
+  compute_type:
+  - 1
+  isR: 1
+  load_list:
+  - 512
+  - 512
+  load_shape:
+  - - 3327
+    - 1
+  - - 2708
+    - 3327
+  save_list:
+  - 512
+  save_shape:
+  - - 1
+    - 3327
+  sparse_path: /Users/sijin/Desktop/RA/MPAD/Eva/Compiler/data/adj_citeseer_3327_1.yaml
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: gather
+  w_list:
+  - - 0
+    - 0
+13:
+  OP_NO: 13
+  compute_list:
+  - 512
+  compute_shape:
+  - - 1
+    - 1
+  compute_type:
+  - 1
+  isR: 1
+  load_list:
+  - 512
+  load_shape:
+  - - 1
+    - 1
+  save_list:
+  - 512
+  save_shape:
+  - - 1
+    - 1
+  sparse_path: ''
+  times_1: 1
+  times_2: 2708
+  times_3: 3327
+  type: applynode
+  w_list:
+  - - 0
+    - 0

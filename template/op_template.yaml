@@ -1,0 +1,19 @@
+- INPUT:
+    feature_number:   []    #node数量
+    input_g_list:     []    #该算子与图结构有关的输入的算子编号序列
+    input_g_num:      0     #该算子有几个与图结构有关的输入
+    input_list:       []    #该算子的输入算子编号序列
+    input_nong_list:  []    #该算子与图结构无关的输入的算子编号序列（即W）
+    input_nong_num:   0     #该算子有几个与图结构无关的输入
+    input_size:       []    #与图结构无关的输入大小，即Weight的大小，单位byte
+    node_id: filename.coo   #目前没用
+    size_per_feature: []    #feature的大小，单位byte
+  OP_NO: 0                  #算子的序号
+  ORDER: R/C                #Row-wise or column-wise
+  OUTPUT:
+    output_id: filename.coo #目前没用
+    output_list:      []    #算子输出给下一个算子的算子编号序列
+    output_number:    0     #输出结构的数量
+    size_per_feature: 0     #feature的大小，单位byte
+  compute_type:             #
+  TYPE: applynode           #算子的类型
