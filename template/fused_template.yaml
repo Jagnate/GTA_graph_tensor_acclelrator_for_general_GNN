@@ -1,0 +1,16 @@
+0:                          #仿真器执行的序号
+  OP_NO:          0         #算子本身的序号
+  compute_list:   []        #计算量
+  compute_shape:  [[]]      #compute一次compute的维度, [[a,b],[...]]表示第一组compute的数据，compute一次需要compute a组数据，每组数据有b个node/edge
+  compute_type:   []        #计算类型 0:mm; 1:ele-wise
+  isR:            1         #顺序是否是row-wise，是为1，不是为0
+  load_list:      []        #load的数据量
+  load_shape:     []        #load一次load的维度, [[a,b],[...]]表示第一组load的数据，load一次需要load a组数据，每组数据有b个node/edge
+  save_list:      []        #save的数据量,维度与save_shape一致
+  save_shape:     []        #save一次save的维度，[[a,b],[...]]表示第一组save的数据，save一次需要save a组数据，每组数据有b个node/edge
+  sparse_path:    ''        #稀疏数据的存储路径
+  times_1:        0         #最外层循环次数
+  times_2:        0         #内层循环次数
+  times_3:        0         #最内层循环次数
+  type:           applynode #算子的类型
+  w_list:         []        #W的数据量

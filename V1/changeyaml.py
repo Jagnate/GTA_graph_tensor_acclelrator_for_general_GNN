@@ -66,7 +66,7 @@ def modify_yaml(path,node_num,edge_num,size_per_feature,isByte):
     data[9]["INPUT"]["feature_number"]      = [edge_num,edge_num]
     data[9]["INPUT"]["input_size"]          = []
     data[9]["OUTPUT"]["size_per_feature"]   = 4*4
-    data[9]["OUTPUT"]["output_number"]      = node_num
+    data[9]["OUTPUT"]["output_number"]      = edge_num
 
     data[10]["INPUT"]["size_per_feature"]    = [4*4]
     data[10]["INPUT"]["feature_number"]      = [node_num]
