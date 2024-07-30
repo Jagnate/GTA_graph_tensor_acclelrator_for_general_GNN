@@ -1,0 +1,54 @@
+- OP_NO: 0                  # id of the operator
+  TYPE: applynode           # type of the operator
+  NODE_NUMBER:        2300  # node number
+  GRAPH_INPUT:
+    input_g_list:           # list of op ids where the graph tensor input comes from
+      - input_feature.bin
+    input_g_num:      1     # how long is the list
+    size_per_feature:       # size of each node feature, in Byte
+      - 64
+    input_nong_list:        # list of op ids where the regular tensor input comes from
+      - weight_1.bin
+    input_nong_num:   1     # how long is the list
+    input_size:             # size of regular tensor input, in Byte
+      - 8192
+  GRAPH_OUTPUT:
+    output_list:            # list of op ids where the output goes
+      - 1
+    output_number:    1     # how long is the list
+    size_per_feature:       # size of each output node feature, in byte
+      - 128
+  COMPUTE:                  # 
+    formula:          j,ij->i    
+    mul:              mul
+    add:              add
+
+- OP_NO:       1                   # id of the operator
+  TYPE:        scatter             # type of the operator
+  DIRECTION:   dst/src             # scatter feature from dst node to edges (row-wise) or from src to edges (column-wise)
+  EDGE:        graph_edge.coo      # the graph edge list
+  INPUT:
+    input_id:         input_node_feat.bin  # use filename if the input is the overall input of model
+    feature_number:   2300                 # number of nodes
+    size_per_feature: 128                  # size of one node feature (byte)
+  OUTPUT:
+    output_id:        1                    # use filename if the output is the overall output of model
+    output_number:    9000                 # number of edges
+    size_per_feature: 128                  # size of one node feature (byte), should be the same as INPUT size_per_feature
+
+- OP_NO:       2                   # id of the operator
+  TYPE:        gather              # type of the operator
+  DIRECTION:   dst/src             # gather feature from edges to dst node (row-wise) or from edges to src (column-wise)
+  EDGE:        graph_edge.coo      # the graph edge list
+  INPUT:
+    input_id:         4                    #
+    feature_number:   9000                 # number of edges
+    size_per_feature: 128                  # size of one edge feature (byte)
+  OUTPUT:
+    output_id:        output_edge_feat.bin # if the output is the overall output of model
+    output_number:    2300                 # number of nodes
+    size_per_feature: 128                  # size of one node feature (byte), should be the same as INPUT size_per_feature
+  COMPUTE:                                 # 
+    formula:          i,i->i    
+    mul:              add
+    add:              none
