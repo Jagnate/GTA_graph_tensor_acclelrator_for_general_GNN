@@ -1,36 +1,32 @@
-fetch
-Inputs:
-feature_base_address (Buffer)
-width: Width of each node feature vector
-length: Number of nodes available in buffer location
-edge_info_array : Could be read from a FIFO Queue? Basically contains all target addresses of a scatter operation. @Kai How many Scatter can we do in parallel ? Is there an upper limit?
-Outputs:
-feature_base_address (Buffer) : Virtual Target Tensor Address in Buffer
-Hardware Target: Fetch Unit
-comment: Virtual Instruction. Generates addresses based on edge information. We plan to optimize this every time through operator fusion.
+- TYPE: fetch 
+  Inputs:
+    feature_buffer_base_address: 0     # feature of some nodes to be scattered in buffer
+    width:                             # Width of each node feature @Marc, number? or Byte? or bitwidth
+    length:                            # Number of nodes available in buffer location 
+    edge_info_array : Could be read from a FIFO Queue? Basically contains all target addresses of a scatter operation. @Kai How many Scatter can we do in parallel ? Is there an upper limit? @Marc, do you mean how many nodes can be fetched in one cycle?
+  Outputs:
+    feature_buffer_base_address: Virtual Target Tensor Address in Buffer
+  Hardware: Fetch
+  comment: (Virtual Instruction) Defined on a tile, Generates addresses based on edge information in Fetch unit and fetch each node at a time. We plan to optimize this every time through instruction fusion.
 
+- TYPE: store 
+  Inputs:
+    buffer_base_address: 0 / Virtual Target Tensor Address in Buffer   # Use virtual address to store what is fetched by fetch inst.
+    length:
+  Outputs:
+    ddr_base_address:                    
+  Hardware: Store                       # Memory Interface Controller 
+  comment: Buffer to DDR, Defined on a feature or a tile (1 node/edge or more?)
 
-
-store (1 or more)
-Inputs:
-base_address (buffer)
-length
-Outputs:
-base_address (DDR)
-Hardware Target: Store Memory Interface Controller 
-comment: Buffer to DDR
-
-load-tile-node
-Inputs:
-node_feature_address (DDR)
-width : Width of each node feature vector
-length : Number of nodes to read in a tile
-Outputs:
-node_feature_address (Buffer)
-comment: DDR to Buffer
-Hardware Target: Load Memory Interface Controller 
-
-
+- TYPE: load-tile-node
+  Inputs:
+    node_feature_address (DDR)
+    width : Width of each node feature vector
+    length : Number of nodes to read in a tile
+  Outputs:
+    node_feature_address (Buffer)
+  Hardware Target: Load Memory Interface Controller 
+  comment: DDR to Buffer
 
 load-tile-edge
 Inputs:
