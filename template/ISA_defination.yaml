@@ -1,0 +1,85 @@
+fetch
+Inputs:
+feature_base_address (Buffer)
+width: Width of each node feature vector
+length: Number of nodes available in buffer location
+edge_info_array : Could be read from a FIFO Queue? Basically contains all target addresses of a scatter operation. @Kai How many Scatter can we do in parallel ? Is there an upper limit?
+Outputs:
+feature_base_address (Buffer) : Virtual Target Tensor Address in Buffer
+Hardware Target: Fetch Unit
+comment: Virtual Instruction. Generates addresses based on edge information. We plan to optimize this every time through operator fusion.
+
+
+
+store (1 or more)
+Inputs:
+base_address (buffer)
+length
+Outputs:
+base_address (DDR)
+Hardware Target: Store Memory Interface Controller 
+comment: Buffer to DDR
+
+load-tile-node
+Inputs:
+node_feature_address (DDR)
+width : Width of each node feature vector
+length : Number of nodes to read in a tile
+Outputs:
+node_feature_address (Buffer)
+comment: DDR to Buffer
+Hardware Target: Load Memory Interface Controller 
+
+
+
+load-tile-edge
+Inputs:
+edge_feature_address (DDR)
+width : Width of each edge feature vector
+length : Number of edges to read in a tile
+Outputs:
+edge_feature_address (Buffer)
+comment: DDR to Buffer
+Hardware Target: Load Memory Interface Controller
+
+
+
+load-graph
+Inputs:
+address : base address to edge list
+num_edges: Length of edge list
+num_nodes: Number of unique nodes per edge list
+Outputs:
+list of commands to load-tile-node unit with inputs described above 
+list of commands to load-tile-edge unit with inputs described above
+list of commands to fetch unit with inputs described above
+list of commands to store unit with inputs described above
+Instruction generating control signals to load nodes and edges in a tiled manner
+@Kai FIFO Instruction Queue between load-graph-unit and load-tile-unit?
+Hardware Target: Graph Tiling Controller ? 
+comment: DDR to Buffer
+
+load-weight
+@Kai do we need load-tile-weight as well instead of load-weight ?
+Inputs:
+base_address (DDR)
+width : Width of each node feature vector
+length : Number of nodes to read in a tile
+Outputs:
+base_address (buffer)
+
+
+comment: DDR to Buffer. Assumption weights are always stored in a way such that we are able to access them efficiently 
+Hardware Target: Load Memory Interface Controller 
+
+comp-tensor-algebra
+Arguments:
+operator type
+Inputs:
+buffer_base_address_in_a
+…
+buffer_base_address_in_c @Kai How many do we support?
+Outputs:
+buffer_base_address_out
+comment: Buffer to Buffer
+Hardware Target: Algebra Computation Unit 
