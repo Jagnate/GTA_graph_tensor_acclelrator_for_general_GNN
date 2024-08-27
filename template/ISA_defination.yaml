@@ -1,9 +1,9 @@
 - TYPE: fetch 
   Inputs:
     feature_buffer_base_address: 0     # feature of some nodes to be scattered in buffer
-    width:                             # Width of each node feature @Marc, number? or Byte? or bitwidth
-    length:                            # Number of nodes available in buffer location 
-    edge_info_array : Could be read from a FIFO Queue? Basically contains all target addresses of a scatter operation. @Kai How many Scatter can we do in parallel ? Is there an upper limit? @Marc, do you mean how many nodes can be fetched in one cycle?
+    number_of_features:                             # Width of each node feature @Marc, number? or Byte? or bitwidth
+    number_of_nodes:                            # Number of nodes available in buffer location
+    edge_info_array: Could be read from a FIFO Queue? Basically contains all target addresses of a scatter operation. @Kai How many Scatter can we do in parallel ? Is there an upper limit? @Marc, do you mean how many nodes can be fetched in one cycle?
   Outputs:
     feature_buffer_base_address: Virtual Target Tensor Address in Buffer
   Hardware: Fetch
@@ -12,70 +12,57 @@
 - TYPE: store 
   Inputs:
     buffer_base_address: 0 / Virtual Target Tensor Address in Buffer   # Use virtual address to store what is fetched by fetch inst.
-    length:
+    number_of_features: 
+    number_of_nodes:  #Also works for edges
   Outputs:
     ddr_base_address:                    
   Hardware: Store                       # Memory Interface Controller 
-  comment: Buffer to DDR, Defined on a feature or a tile (1 node/edge or more?)
+  comment: Buffer to DDR, Defined on a feature or a tile (1 node/edge or more?). We always read X elements from buffer (defined by architecture)
 
-- TYPE: load-tile-node
+- TYPE: load-tile
+  Argument:
   Inputs:
-    node_feature_address (DDR)
-    width : Width of each node feature vector
-    length : Number of nodes to read in a tile
+    tile_info_array: #From load-graph
+      type : enum {node,edge} # node is dense, edge is sparse 
+      ddr_base_address: (DDR)
+      number_of_features : Width of each node feature vector
+      number_of_nodes : Number of nodes or edges to read in a tile
   Outputs:
-    node_feature_address (Buffer)
+    buffer_base_address: (Buffer)
   Hardware Target: Load Memory Interface Controller 
   comment: DDR to Buffer
-
-load-tile-edge
-Inputs:
-edge_feature_address (DDR)
-width : Width of each edge feature vector
-length : Number of edges to read in a tile
-Outputs:
-edge_feature_address (Buffer)
-comment: DDR to Buffer
-Hardware Target: Load Memory Interface Controller
-
-
-
+  
 load-graph
 Inputs:
-address : base address to edge list
-num_edges: Length of edge list
-num_nodes: Number of unique nodes per edge list
+  address : base address to edge list
+  num_edges: Length of edge list
+  num_nodes: Number of unique nodes per edge list
 Outputs:
-list of commands to load-tile-node unit with inputs described above 
-list of commands to load-tile-edge unit with inputs described above
-list of commands to fetch unit with inputs described above
-list of commands to store unit with inputs described above
-Instruction generating control signals to load nodes and edges in a tiled manner
-@Kai FIFO Instruction Queue between load-graph-unit and load-tile-unit?
+  tile_info_array: #list of commands to load-tile unit with inputs described above
+  edge_info_array: #list of commands to fetch unit with inputs described above
 Hardware Target: Graph Tiling Controller ? 
-comment: DDR to Buffer
+comment: Prepare loading data from DDR to Buffer. Instruction generating control signals to load nodes and edges in a tiled manner
 
 load-weight
-@Kai do we need load-tile-weight as well instead of load-weight ?
 Inputs:
-base_address (DDR)
-width : Width of each node feature vector
-length : Number of nodes to read in a tile
+  ddr_base_address: # (DDR)
+  number_of_features : #Width of each node feature vector
+  number_of_nodes : #Number of nodes to read in a tile
 Outputs:
-base_address (buffer)
-
-
+  buffer_base_address (buffer)
 comment: DDR to Buffer. Assumption weights are always stored in a way such that we are able to access them efficiently 
 Hardware Target: Load Memory Interface Controller 
 
 comp-tensor-algebra
-Arguments:
-operator type
+Argument:
+  operator: type #Defined as formula
 Inputs:
-buffer_base_address_in_a
-…
-buffer_base_address_in_c @Kai How many do we support?
+  a_buffer_base_address:
+  a_dimension_array: #List of dimensions of buffer a, e.g. [number_of_nodes,number_of_features]
+  b_buffer_base_address:
+  b_dimension_array: #List of dimensions of buffer a, e.g. [number_of_nodes,number_of_features]
 Outputs:
-buffer_base_address_out
+  c_buffer_base_address:
+  c_dimension_array: #Is calcu
 comment: Buffer to Buffer
 Hardware Target: Algebra Computation Unit 
