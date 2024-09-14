@@ -1,68 +1,61 @@
-- TYPE: fetch 
-  Inputs:
-    feature_buffer_base_address: 0     # feature of some nodes to be scattered in buffer
-    number_of_features:                             # Width of each node feature @Marc, number? or Byte? or bitwidth
-    number_of_nodes:                            # Number of nodes available in buffer location
-    edge_info_array: Could be read from a FIFO Queue? Basically contains all target addresses of a scatter operation. @Kai How many Scatter can we do in parallel ? Is there an upper limit? @Marc, do you mean how many nodes can be fetched in one cycle?
-  Outputs:
-    feature_buffer_base_address: Virtual Target Tensor Address in Buffer
-  Hardware: Fetch
-  comment: (Virtual Instruction) Defined on a tile, Generates addresses based on edge information in Fetch unit and fetch each node at a time. We plan to optimize this every time through instruction fusion.
+- OP_NO: 0                       # id of the operator
+  TYPE: applynode                # type of the operator
+  NODE_NUMBER: 2300              # node number
+  GRAPH_INPUT:
+    num: 1                       # how many graph input is there (how long are the following lists)
+    list:                        # list of op ids where the graph tensor input comes from
+      - input_feature.bin
+    size_per_feat:               # size of each node feature, in Byte
+      - 64
+    data_format:                 # data format of each input
+      - FP16
+  NON_GRAPH_INPUT:
+    num: 1                       # how many non-graph input is there (how long are the following lists)
+    list:                        # list of op ids where the regular tensor input comes from
+      - weight_1.bin
+    total_size:                  # size of regular tensor input, in Byte
+      - 8192
+    data_format:                 # data format of each input
+      - FP16
+  GRAPH_OUTPUT:
+    num: 1                       # how long is the list
+    output_list:                 # list of op ids where the output goes
+      - 1
+    size_per_feature:            # size of each output node feature, in byte
+      - 128
+    data_format:                 # data format of each output
+      - FP16
+  COMPUTE:                       # computing rule of each node
+    formula:          j,ij->i    
+    mul:              mul
+    add:              add
 
-- TYPE: store 
-  Inputs:
-    buffer_base_address: 0 / Virtual Target Tensor Address in Buffer   # Use virtual address to store what is fetched by fetch inst.
-    number_of_features: 
-    number_of_nodes:  #Also works for edges
-  Outputs:
-    ddr_base_address:                    
-  Hardware: Store                       # Memory Interface Controller 
-  comment: Buffer to DDR, Defined on a feature or a tile (1 node/edge or more?). We always read X elements from buffer (defined by architecture)
+- OP_NO:     1                   # id of the operator
+  TYPE:      scatter             # type of the operator
+  DIRECTION: dst/src             # scatter feature from dst node to edges (row-wise) or from src to edges (column-wise)
+  EDGE:      graph_edge.coo      # the graph edge list
+  INPUT:
+    input_id:         input_node_feat.bin  # use filename if the input is the overall input of model
+    input_number:     2300                 # number of nodes
+    size_per_feature: 128                  # size of one node feature (byte)
+  OUTPUT:
+    output_id:        1                    # use filename if the output is the overall output of model
+    output_number:    9000                 # number of edges
+    size_per_feature: 128                  # size of one node feature (byte), should be the same as INPUT size_per_feature
 
-- TYPE: load-tile
-  Argument:
-  Inputs:
-    tile_info_array: #From load-graph
-      type : enum {node,edge} # node is dense, edge is sparse 
-      ddr_base_address: (DDR)
-      number_of_features : Width of each node feature vector
-      number_of_nodes : Number of nodes or edges to read in a tile
-  Outputs:
-    buffer_base_address: (Buffer)
-  Hardware Target: Load Memory Interface Controller 
-  comment: DDR to Buffer
-  
-load-graph
-Inputs:
-  address : base address to edge list
-  num_edges: Length of edge list
-  num_nodes: Number of unique nodes per edge list
-Outputs:
-  tile_info_array: #list of commands to load-tile unit with inputs described above
-  edge_info_array: #list of commands to fetch unit with inputs described above
-Hardware Target: Graph Tiling Controller ? 
-comment: Prepare loading data from DDR to Buffer. Instruction generating control signals to load nodes and edges in a tiled manner
-
-load-weight
-Inputs:
-  ddr_base_address: # (DDR)
-  number_of_features : #Width of each node feature vector
-  number_of_nodes : #Number of nodes to read in a tile
-Outputs:
-  buffer_base_address (buffer)
-comment: DDR to Buffer. Assumption weights are always stored in a way such that we are able to access them efficiently 
-Hardware Target: Load Memory Interface Controller 
-
-comp-tensor-algebra
-Argument:
-  operator: type #Defined as formula
-Inputs:
-  a_buffer_base_address:
-  a_dimension_array: #List of dimensions of buffer a, e.g. [number_of_nodes,number_of_features]
-  b_buffer_base_address:
-  b_dimension_array: #List of dimensions of buffer a, e.g. [number_of_nodes,number_of_features]
-Outputs:
-  c_buffer_base_address:
-  c_dimension_array: #Is calcu
-comment: Buffer to Buffer
-Hardware Target: Algebra Computation Unit 
+- OP_NO:       2                  # id of the operator
+  TYPE:        gather             # type of the operator
+  DIRECTION:   dst/src            # gather feature from edges to dst node (row-wise) or from edges to src (column-wise)
+  EDGE:        graph_edge.coo     # the graph edge list
+  INPUT:
+    input_id:         4                    #
+    feature_number:   9000                 # number of edges
+    size_per_feature: 128                  # size of one edge feature (byte)
+  OUTPUT:
+    output_id:        output_node_feat.bin # if the output is the overall output of model
+    output_number:    2300                 # number of nodes
+    size_per_feature: 128                  # size of one node feature (byte), should be the same as INPUT size_per_feature
+  COMPUTE:                                 # 
+    formula:          i,i->i    
+    mul:              add
+    add:              none
