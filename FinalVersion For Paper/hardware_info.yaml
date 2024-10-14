@@ -1,0 +1,69 @@
+- Hardware:
+  Buffer_Size: 2 #MB
+  Parallelism:
+    - parallelism_in: 16 #个feature
+    - parallelism_out: 16
+  Bandwidth: 128 #GB/s
+
+#fusion之后hardware_unit: MM
+#scatter的fetch
+
+- Inst_fused:
+  - Pattern: [scatter,gather]
+    Compute_Type: [NONE,ADD]
+    Buffer_Type: Edge
+    Is_Fused: True
+  
+  - Pattern: [gather,scatter]
+    Compute_Type: [ADD,NONE]
+    Buffer_Type: Node
+    Is_Fused: False
+  
+  - Pattern: [scatter,applyedge]
+    Compute_Type: [NONE,MM]
+    Buffer_Type: Edge
+    Is_Fused: True
+  - Pattern: [scatter,applyedge]
+    Compute_Type: [NONE,ADD]
+    Buffer_Type: Edge
+    Is_Fused: True
+
+  - Pattern: [applyedge,gather]
+    Compute_Type: [MM,ADD]
+    Buffer_Type: Edge
+    Is_Fused: True
+  - Pattern: [applyedge,gather]
+    Compute_Type: [MUL,ADD]
+    Buffer_Type: Edge
+    Is_Fused: True
+  - Pattern: [applyedge,gather]
+    Compute_Type: [ELE,ELE]
+    Buffer_Type: Edge
+    Is_Fused: False
+  
+  - Pattern: [applyedge,applyedge]
+    Compute_Type: [MM,MM]
+    Buffer_Type: Edge
+    Is_Fused: False
+  - Pattern: [applyedge,applyedge]
+    Compute_Type: [MM,ELE]
+    Buffer_Type: Edge
+    Is_Fused: False
+  - Pattern: [applyedge,applyedge]
+    Compute_Type: [ELE,ELE]
+    Buffer_Type: Edge
+    Is_Fused: False
+  
+  - Pattern: [applynode,applynode]
+    Compute_Type: [MM,MM]
+    Buffer_Type: Node
+    Is_Fused: False
+  - Pattern: [applynode,applynode]
+    Compute_Type: [MM,ELE]
+    Buffer_Type: Node
+    Is_Fused: False
+  - Pattern: [applynode,applynode]
+    Compute_Type: [ELE,ELE]
+    Buffer_Type: Node
+    Is_Fused: False
+  
